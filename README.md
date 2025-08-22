@@ -214,6 +214,34 @@ Convert any voice to sound like another!
 
 Requires **Python 3.10.x** and **[FFmpeg](https://ffmpeg.org/download.html)** (on PATH).
 
+### 🐳 Docker Installation (Recommended)
+
+**Easiest way with GPU/CPU auto-detection:**
+```bash
+git clone https://github.com/petermg/Chatterbox-TTS-Extended
+cd Chatterbox-TTS-Extended
+./docker-run.sh
+```
+
+The script will automatically:
+- Detect NVIDIA GPU support (great for RTX 3060)
+- Fall back to CPU mode (perfect for Mac M4)
+- Build and start the container
+- Open the web interface at `http://localhost:7860`
+
+**Manual Docker commands:**
+```bash
+# For NVIDIA GPU systems (Windows RTX 3060)
+docker compose --profile gpu up --build
+
+# For CPU-only systems (Mac M4)
+docker compose --profile cpu up --build
+```
+
+See [DOCKER.md](DOCKER.md) for detailed Docker setup instructions.
+
+### 🐍 Traditional Python Installation
+
 Clone the repo:
 ```bash
 git clone https://github.com/petermg/Chatterbox-TTS-Extended

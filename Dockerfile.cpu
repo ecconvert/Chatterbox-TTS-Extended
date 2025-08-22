@@ -1,0 +1,64 @@
+# CPU-only version for Mac M4 and systems without NVIDIA GPU
+FROM python:3.10-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    git \
+    wget \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first for better Docker layer caching
+COPY requirements.txt requirements.base.with.versions.txt requirements_frozen.txt ./
+
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Install PyTorch CPU version
+RUN pip install torch==2.7.0 torchaudio==2.7.0 --extra-index-url https://download.pytorch.org/whl/cpu
+
+# Install other requirements (excluding the CUDA index)
+RUN pip install gradio==5.32.0 \
+    numpy==2.2.6 \
+    nltk==3.9.1 \
+    faster-whisper==1.1.1 \
+    openai-whisper==20240930 \
+    ffmpeg-python==0.2.0 \
+    auto-editor==27.1.1 \
+    resampy==0.4.3 \
+    librosa==0.10.0 \
+    s3tokenizer==0.1.7 \
+    spaces==0.36.0 \
+    transformers==4.46.3 \
+    diffusers==0.29.0 \
+    omegaconf==2.3.0 \
+    resemble-perth==1.0.1 \
+    silero-vad==5.1.2 \
+    conformer==0.3.2 \
+    soundfile==0.13.1 \
+    pyrnnoise==0.3.8
+
+# Copy the application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p /app/outputs /app/settings
+
+# Expose the port that Gradio uses
+EXPOSE 7860
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:7860 || exit 1
+
+# Default command - run with public access enabled
+CMD ["python", "Chatter.py", "--host", "0.0.0.0", "--port", "7860"]

@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  chatterbox-gpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chatterbox-tts-gpu
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./outputs:/app/outputs
+      - ./settings:/app/settings
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+    profiles:
+      - gpu
+
+  chatterbox-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    container_name: chatterbox-tts-cpu
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./outputs:/app/outputs
+      - ./settings:/app/settings
+    restart: unless-stopped
+    profiles:
+      - cpu
