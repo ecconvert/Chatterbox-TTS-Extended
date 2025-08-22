@@ -1,5 +1,5 @@
 # Use NVIDIA CUDA runtime as base image for GPU support
-ARG BASE_IMAGE=nvidia/cuda:11.8-runtime-ubuntu22.04
+ARG BASE_IMAGE=nvidia/cuda:13.0.0-runtime-ubuntu22.04
 FROM ${BASE_IMAGE}
 
 # Set environment variables
