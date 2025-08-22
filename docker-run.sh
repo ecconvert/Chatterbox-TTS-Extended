@@ -76,12 +76,22 @@ fi
 # Build and run the appropriate container
 if [ "$USE_GPU" = true ]; then
     echo -e "${GREEN}🚀 Starting Chatterbox-TTS with GPU acceleration...${NC}"
-    docker compose --profile gpu up --build -d
-    echo -e "${GREEN}✅ GPU container started successfully!${NC}"
+    if docker compose --profile gpu up --build -d; then
+        echo -e "${GREEN}✅ GPU container started successfully!${NC}"
+    else
+        echo -e "${RED}❌ GPU container failed to start. Trying CPU mode as fallback...${NC}"
+        USE_GPU=false
+        docker compose --profile cpu up --build -d
+        echo -e "${GREEN}✅ CPU container started successfully!${NC}"
+    fi
 else
     echo -e "${BLUE}🚀 Starting Chatterbox-TTS in CPU mode...${NC}"
-    docker compose --profile cpu up --build -d
-    echo -e "${GREEN}✅ CPU container started successfully!${NC}"
+    if docker compose --profile cpu up --build -d; then
+        echo -e "${GREEN}✅ CPU container started successfully!${NC}"
+    else
+        echo -e "${RED}❌ Failed to start container. Please check the logs with: docker compose logs${NC}"
+        exit 1
+    fi
 fi
 
 echo ""

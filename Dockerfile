@@ -27,7 +27,7 @@ RUN ln -sf /usr/bin/python3.10 /usr/bin/python
 WORKDIR /app
 
 # Copy requirements first for better Docker layer caching
-COPY requirements.txt requirements.base.with.versions.txt requirements_frozen.txt ./
+COPY requirements.txt requirements.base.with.versions.txt requirements_frozen.txt requirements.docker.txt ./
 
 # Create virtual environment and install Python dependencies
 RUN python -m venv /opt/venv
@@ -39,8 +39,11 @@ RUN pip install --upgrade pip
 # Install PyTorch with CUDA support first
 RUN pip install torch==2.7.0 torchaudio==2.7.0 --extra-index-url https://download.pytorch.org/whl/cu118
 
-# Install other requirements
-RUN pip install -r requirements.base.with.versions.txt
+# Install core requirements
+RUN pip install -r requirements.docker.txt
+
+# Try to install pyrnnoise, but don't fail if it's not available
+RUN pip install pyrnnoise==0.3.8 || echo "Warning: pyrnnoise not available for this architecture, audio denoising will be disabled"
 
 # Copy the application code
 COPY . .
