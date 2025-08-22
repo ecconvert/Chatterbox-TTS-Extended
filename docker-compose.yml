@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   chatterbox-gpu:
     build:
@@ -21,6 +19,13 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    # Health check - be patient during startup
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 300s  # Give 5 minutes for initial startup
+      retries: 3
     restart: unless-stopped
     profiles:
       - gpu
@@ -35,6 +40,13 @@ services:
     volumes:
       - ./outputs:/app/outputs
       - ./settings:/app/settings
+    # Health check - be patient during startup
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 300s  # Give 5 minutes for initial startup
+      retries: 3
     restart: unless-stopped
     profiles:
       - cpu

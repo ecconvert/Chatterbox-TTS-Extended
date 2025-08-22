@@ -48,6 +48,9 @@ RUN pip install pyrnnoise==0.3.8 || echo "Warning: pyrnnoise not available for t
 # Copy the application code
 COPY . .
 
+# Download required NLTK data
+RUN python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab')"
+
 # Create necessary directories
 RUN mkdir -p /app/outputs /app/settings
 
